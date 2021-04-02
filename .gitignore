@@ -12,6 +12,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+/prog2_lev_beadando16_y1je9i/sorrend.txt
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
