@@ -16,10 +16,10 @@ int main() {
 	kezd = clock();
 
 	// 2.) Azon versenyzõk rajtszámát, akiknek egymás után két (vagy több) lövése is talált
-	cout << endl << "2. feladat:\nAz egymast kovetoen tobbszor talalo versenyzok: " << L.konzisztens_lovok() << endl;
+	cout << endl << "2. feladat:\nAz egymast kovetoen tobbszor talalo versenyzok: " << L.min_ket_talalat_eldontessel() << endl;
 
 	// 3.) A legtöbb lövést leadó versenyzõ (azonos lövésszám esetén a legalacsonyabb rajtszámú)
-	cout << endl << "3. feladat\nA legtobb lovest leado versenyzo rajtszama: " << L.legtobb_loves() + 1 << endl;
+S	cout << endl << "3. feladat\nA legtobb lovest leado versenyzo rajtszama: " << L.legtobb_loves() + 1 << endl;
 
 	// 5.) Versenyzõ sorszámának bekérése, és a sorszámhoz tartozó információk kiírása a képernyõre
 	cout << endl << "5. feladat";
