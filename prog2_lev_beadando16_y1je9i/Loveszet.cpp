@@ -1,6 +1,6 @@
 #include "Loveszet.h"
 
-Loveszet::Loveszet(char* filenev) {
+Loveszet::Loveszet(char *filenev) {
 	/*
 	A Lövészet osztály konstruktorja
 
@@ -13,7 +13,7 @@ Loveszet::Loveszet(char* filenev) {
 	Amennyiben a fájl nem hibás, az adatokat egy struktúrába olvassa a program,
 	és sorba rendezi õket.
 
-	@param char pointer: filenev - a megnyitandó fájl neve avagy elérési útvonala
+	char pointer: filenev - a megnyitandó fájl neve avagy elérési útvonala
 	*/
 	ifstream be(filenev);
 	if (be.fail()) {
@@ -23,9 +23,8 @@ Loveszet::Loveszet(char* filenev) {
 		system("pause"); exit(EXIT_FAILURE);
 	}
 
-	int i=0;
-	int sorok_szama = 0;
-	unsigned int fajlban_letszam;
+	unsigned int sorok_szama = 0;
+	unsigned int fejlec_letszam;
 	string sor;
 
 	// megszámoljuk a fájlban szereplõ sorok számát
@@ -41,24 +40,33 @@ Loveszet::Loveszet(char* filenev) {
 	be >> sor; // beolvassuk az elsõ sort, mely a versenyzõk számát jelöli
 	// ha az elsõ sor numerikus, elmentjük számként, ha nem, a program kilép
 	if (ervenyes_szoveg(sor, "0123456789")) { 
-		fajlban_letszam = stoi(sor); 
+		fejlec_letszam = stoi(sor); 
 	}
 	else {
 		cout << "Ervenytelen fajl!\nAfajl elso soraban szamnak (a versenyzok szamanak) kell szerepelnie.\n\n";
 		system("pause"); exit(EXIT_FAILURE);
 	}
 
-	// ha a fájlban szereplõ létszám nem egyezik a sorok számával (mínusz 1, mert az elsõ sorban maga a létszám szerepel), a fájl hibás
-	if (fajlban_letszam != sorok_szama - 1) {
+	// v - a versenyzõk száma (sorok száma, mínusz 1, mert az elsõ sorban maga a létszám szerepel)
+	Loveszet::v = sorok_szama - 1;
+
+	// ha a fejlécben szereplõ szám nem egyezik a sorok számával, a fájl hibás
+	if (fejlec_letszam != v) {
 		cerr << "Hibas fajl!\nA fajl elso soraban levo letszam nem egyezik a fajlban tarolt adatok szamaval."
 			"A fajl nem feldolgozhato." << endl << endl;
 		system("pause"); exit(EXIT_FAILURE);
 	}
 
-	//v - a versenyzõk száma (sorok száma, mínusz 1, mert az elsõ sorban maga a létszám szerepel)
-	Loveszet::v = sorok_szama - 1;
+	// ha a versenyzõk száma nem 2 és 100 közötti, a program kilép
+	if (v < 2 || v > 100) {
+		cerr << "Legalabb 2 es legfeljebb 100 versenyzo lehet a fajlban.\nA fajl nem feldolgozhato" << endl << endl;
+		system("pause"); exit(EXIT_FAILURE);
+	}
+
+	// a versenyzõk számával megegyezõ méretû struktúra tömb létrehozása
 	Loveszet::tmb = new Versenyzo[v];
-	int nemerv_index=0;
+	int nemerv_index = 0;
+	int i = 0;
 
 	// beolvasunk minden nem üres sort, és megnézzük, hogy csak érvényes karakterek szerepelnek-e benne
 	// ha érvényes a sor, egy struktúra tömbben elmentõdnek az adatok
@@ -107,10 +115,11 @@ Loveszet::~Loveszet() {
 bool Loveszet::ervenyes_szoveg(const string &szoveg, string erv_karakterek) {
 	/*
 	Megvizsgálja, hogy egy adott string formátumú szöveg csak érvényes karaktereket tartalmaz-e
-	@param szoveg: szoveg - konstans referencia string - a szöveg, amelyet vizsgálunk
-	@param erv_karakterek: erv_karakterek - konstans string (opcionális) - az elfogadott karakterekbõl álló string, alapértelmezetten "+-"
+	
+	const string &szoveg: referencia a vizsgálandó szövegre
+	erv_karakterek (opcionális): az elfogadott karakterekbõl álló string, alapértelmezetten "+-"
 
-	@return bool - true, ha csak érvényes karaktert tartalmaz a szöveg, false, ha legalább 1 évrénytelent
+	return bool: true, ha csak érvényes karaktert tartalmaz a szöveg, false, ha legalább 1 évrénytelent
 	*/
 	bool rosszchar = false;
 	int talalat;
@@ -127,13 +136,14 @@ bool Loveszet::ervenyes_szoveg(const string &szoveg, string erv_karakterek) {
 bool Loveszet::ervenyes_szoveg(char *szoveg, int h) {
 	/*
 	Megvizsgálja, hogy egy adott char formátumú szöveg csak érvényes karaktereket tartalmaz-e
-	@param szoveg: szoveg - char mutató - a karaktersorozat 0. elemére mutat
-	@param erv_karaktere: erv_karakterek - integer - a karaktersorozat hosszát tartalmazza
+	
+	char *szoveg: a karaktersorozat 0. elemének memóriacímére mutat
+	int h: a karaktersorozat hossza
 
-	@return bool - true, ha csak érvényes karaktert tartalmaz a szöveg, false, ha legalább 1 évrénytelent
+	return bool: true, ha csak érvényes karaktert tartalmaz a szöveg, false, ha legalább 1 évrénytelent
 	*/
 	int i = 0;
-	while (((szoveg[i] == PLUSZ) || (szoveg[i] == MINUSZ)) && i < h) i++;
+	while (i < h && ((szoveg[i] == PLUSZ) || (szoveg[i] == MINUSZ))) i++;
 	return i == h;
 }
 
@@ -152,26 +162,38 @@ void Loveszet::kiir() {
 	cout << endl;
 }
 
-string Loveszet::min_ket_talalat_eldontessel() {
+string Loveszet::min_ket_talalat_kivalogat() {
 	/*
 	Eldöntés tételével azonosítja azon versenyzõket, akiknak van legalább kettõ egymás követõ találata
 	Végigmegy a versenyzõk struktúra tömbjének char lövésrekordjain (0-tól n-1 -ig), 
 	és megvizsgálja, hogy adott elem és az utána következõ elem egyaránt plusz jel-e.
 	Ha igen, van legalább két egymást követõ talált lövés
 
-	@return a versenyzõk rajtszám egybefûzött stringként, szóközzel elválasztva
+	return string: a versenyzõk rajtszámai egybefûzött stringként, szóközzel elválasztva
 	*/
 	string s;
 	int j;
+	char *c;
+	c = new char [v];
+	int db=0;
+
 	for (int i = 0; i < v; i++) {
-		j = 0; // 0-tól (n-1)-ig menve megnézzük, van-e olyan elem, ahol az akutális és a köv. elem is +
-		while ((tmb[i].clovesek[j] != PLUSZ || tmb[i].clovesek[j + 1] != PLUSZ) && j < (tmb[i].l - 1)) {
+		j = 0; // 0-tól (n-1)-ig menve megnézzük, az aktuális és a köv. elem is +
+		while (j < (tmb[i].l - 1) && (tmb[i].clovesek[j] != PLUSZ || tmb[i].clovesek[j + 1] != PLUSZ)) {
 			j++;
 		}
 		if (j < (tmb[i].l - 1)) {
-			s += to_string(i + 1) + " ";
+			//s += to_string(i + 1) + " ";
+			c[db] = i + 1;
+			db++;
 		}
 	}
+
+	for (int i = 0; i < db; i++) {
+		s += to_string(c[i]) + " ";
+	}
+
+	delete[]c;
 	return s;
 }
 
@@ -181,7 +203,7 @@ string Loveszet::min_ket_talalat_stringfinddal() {
 	Végigmegy a versenyzõk struktúra tömbjének string lövésrekordjain,
 	és megvizsgálja, a rekordjukban, szerepel-e a "++" string
 
-	@return a versenyzõk rajtszám egybefûzött stringként, szóközzel elválasztva
+	return string: a versenyzõk rajtszám egybefûzött stringként, szóközzel elválasztva
 	*/
 	string s;
 	for (int i = 0; i < v; i++) {
@@ -197,7 +219,7 @@ int Loveszet::legtobb_loves() {
 	Maximum kiválasztás elvével megkeresi a legtöbb lövést leadó versenyzõt
 	Egyenlõség esetén a kisebb rajtszámú versenyzõ számít maximumnak
 
-	@return int - a legtöbb lövést leadó versenyzõ rajtszáma
+	return int: a legtöbb lövést leadó versenyzõ rajtszáma
 	*/
 	int maxlovo = 0;
 	if (v > 1) {
@@ -217,9 +239,10 @@ int Loveszet::loertek(char *sor, int hossz) {
 	- 20 pontot ér a legelsõ célpont eltalálása. 
 	- Minden célt tévesztett lövés eggyel csökkenti a következõ találattal megszerezhetõ pontok számát
 
-	@param char *sor: a fájl adott sorából képzett karaktertömb 0. elemének memóriacíme
-	@param int hossz: a karaktertömb elemszáma (a kezdõcímtõl való eltérés)
-	@return int: a versenyzõ pontszáma
+	char *sor: a fájl adott sorából képzett karaktertömb 0. elemének memóriacíme
+	int hossz: a karaktertömb elemszáma (a kezdõcímtõl való eltérés)
+	
+	return int: a versenyzõ pontszáma
 	*/
 	int aktpont = 20, ertek = 0;
 	for (int i = 0; i < hossz; i++) {							// végigmegyünk a rekord karakterein
@@ -233,8 +256,9 @@ int Loveszet::ossztalalt(int rajtszam) {
 	/*
 	Összegzés tételének módszerével a függvény kiszámolja, össz. hány találat ("+") volt
 
-	@param int rajtszam: a rendezetlen tömb indexe, ami a rajtszám
-	@return int: az összes találat száma
+	int rajtszam: a rendezetlen tömb indexe, ami a rajtszám
+	
+	return int: az összes találat száma
 	*/
 	int talalt=0, r = rajtszam - 1;
 	for (int i = 0; i < tmb[r].l; i++) {
@@ -244,15 +268,42 @@ int Loveszet::ossztalalt(int rajtszam) {
 }
 
 string Loveszet::talalatok_sorszamai(int rajtszam) {
+	/*
+	Adott sorozatra/rekordra visszaadja, hányadik lövések találtak célt.
+
+	int rajtszam: a rendezetlen tömb indexe, ami a rajtszám
+	
+	return string: a célt talált lövések sorszámai, szóközökkel elválasztott stringgé összefûzve
+	*/
 	string s;
 	int r = rajtszam - 1;
+	char *c;
+	c = new char[tmb[r].l];
+	int db = 0;
+
 	for (int i = 0; i < tmb[r].l; i++) {
-		if (tmb[r].clovesek[i] == PLUSZ) s += to_string(i + 1) + " ";
+		if (tmb[r].clovesek[i] == PLUSZ) {
+			c[db] = i + 1;
+			db++;
+		}
 	}
+
+	for (int i = 0; i < db; i++) {
+		s += to_string(c[i]) + " ";
+	}
+
+	delete[]c;
 	return s;
 }
 
 int Loveszet::leghosszabb_sorozat(int rajtszam) {
+	/*
+	Adott sorozatra/rekordra visszaadja, hány lövésbõl állt a leghosszabb pozitív sorozat
+
+	int rajtszam: a rendezetlen tömb indexe, ami a rajtszám
+	
+	return int: a leghosszabb pozitív sorozat nagysága (hány találatból állt a leghosszabb sorozat)
+	*/
 	int talalt = 0, max = 0, r = rajtszam - 1;
 	for (int i = 0; i < tmb[r].l; i++) {
 		if (talalt > max) max = talalt;
@@ -267,6 +318,11 @@ int Loveszet::leghosszabb_sorozat(int rajtszam) {
 }
 
 void Loveszet::rangsorol(Versenyzo *a) {
+	/*
+	Buborékos elvvel sorba rendezi a versenyzõ struktúra tömböt, majd helyezést rendel a versenyzõkhöz.
+
+	Versenyzo pointer a: versenyzõ tömb 0. elemének memóriacíme
+	*/
 	Versenyzo seged;
 	for (int i = 1; i < v; i++) {
 		for (int j = v - 1; j >= i; j--) {
@@ -290,6 +346,12 @@ void Loveszet::rangsorol(Versenyzo *a) {
 }
 
 void Loveszet::adatexport(char *filenev) {
+	/*
+	A megadott fájlba exportálja a sorbarendezett rangsor nevû Versenyzõ struktúra tömböt,
+	adott formátumban (helyezés, rajtszm, pontszám), pontszm szerint csökkenõ sorrendben
+
+	char pointer filenev: az exportálandó fájl neve (vagy teljes elérési útvonala)
+	*/
 	ofstream ki(filenev);
 	cout.setf(ios::left);
 	cout << "\n\nHELY.\tRAJTSZ.\tPONT\n";

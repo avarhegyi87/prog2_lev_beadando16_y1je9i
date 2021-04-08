@@ -16,23 +16,23 @@ int main() {
 	kezd = clock();
 
 	// 2.) Azon versenyzõk rajtszámát, akiknek egymás után két (vagy több) lövése is talált
-	cout << endl << "2. feladat:\nAz egymast kovetoen tobbszor talalo versenyzok: " << L.min_ket_talalat_eldontessel() << endl;
+	cout << endl << "2. feladat:\nAz egymast kovetoen tobbszor talalo versenyzok: " << L.min_ket_talalat_kivalogat() << endl;
 
 	// 3.) A legtöbb lövést leadó versenyzõ (azonos lövésszám esetén a legalacsonyabb rajtszámú)
-S	cout << endl << "3. feladat\nA legtobb lovest leado versenyzo rajtszama: " << L.legtobb_loves() + 1 << endl;
+	cout << endl << "3. feladat:\nA legtobb lovest leado versenyzo rajtszama: " << L.legtobb_loves() + 1 << endl;
 
 	// 5.) Versenyzõ sorszámának bekérése, és a sorszámhoz tartozó információk kiírása a képernyõre
 	cout << endl << "5. feladat";
 	bool fkilep = false;
 	int valasztas = lekerdez;
-	int bekeres;
+	int bekeres = 0;
 	
 	while (!fkilep) {
 		do {
 			cout << endl << "Adjon meg egy rajtszamot! ";			
 			cin >> bekeres;
 			if (bekeres < 0 || bekeres > L.getLetszam()) {
-				cout << endl << "A szam erteke 0 es " << L.getLetszam() << " legyen!";
+				cout << endl << "A szam erteke 1 es " << L.getLetszam() << " kozott legyen!";
 			}
 		} while (bekeres < 0 || bekeres > L.getLetszam());
 
@@ -68,14 +68,24 @@ S	cout << endl << "3. feladat\nA legtobb lovest leado versenyzo rajtszama: " << 
 }
 
 int menukiiras() {
-	int valasztas;
+	int opcio;
+	int cimhossz, opcmaxhossz;
+	const string cim = "\t********    OPCIOK    ********";
+	const string opcstr_lekerdez = "(1) On altal valasztott versenyzo eredmenyeinek lekerdezese";
+	const string opcstr_kilep = "(2) Kilepes ebbol a funkciobol es a program folytatasa";
+	string szokozok;
 
-	cout << endl << endl;
-	cout << "****\tOPCIOK\t****" << endl;
-	cout << "(1) On altal valasztott versenyzo eredmenyeinek lekerdezese" << endl;
-	cout << "(2) Kilepes ebbol a funkciobol es a program folytatasa" << endl;
+	cimhossz = cim.length();
+	if (opcstr_kilep.length() > opcstr_lekerdez.length()) opcmaxhossz = opcstr_kilep.length();
+	else opcmaxhossz = opcstr_lekerdez.length();
+
+	for (int i = 0; i < (opcmaxhossz / 2 - cimhossz / 2); i++) szokozok += " ";
+
+	cout << endl << endl << endl;
+	cout.setf(ios::left);
+	cout << szokozok << cim << endl << opcstr_lekerdez << endl << opcstr_kilep << endl;
 	cout << "Valasszon egy opciot a fentiek kozul: ";
-	cin >> valasztas;
+	cin >> opcio;
 
-	return valasztas;
+	return opcio;
 }

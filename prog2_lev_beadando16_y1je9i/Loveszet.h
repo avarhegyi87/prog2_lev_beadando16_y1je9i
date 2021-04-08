@@ -26,7 +26,7 @@ public:
 	void kiir();
 	void adatexport(char *filenev);
 
-	string min_ket_talalat_eldontessel();
+	string min_ket_talalat_kivalogat();
 	string min_ket_talalat_stringfinddal();
 	string talalatok_sorszamai(int rajtszam);
 
@@ -37,9 +37,9 @@ public:
 
 private:
 
-	int v;
 	Versenyzo *tmb;
 	Versenyzo *rangsor;
+	int v;
 	const string LOVES_JELEK = "+-";
 	const char PLUSZ = 43;
 	const char MINUSZ = 45;
