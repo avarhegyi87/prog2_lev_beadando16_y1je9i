@@ -33,9 +33,20 @@ Loveszet::Loveszet(char *filenev) {
 		if (sor != "") {
 			sorok_szama++;
 		}
+		if (sor.find(" ") != string::npos) {
+			cerr << "Szokoz eszlelve az egyik sorban. A szokozok hibas adatbeolvasast eredmenyeznek.\n"
+				"Torolje ki a szokozoket a loveseket szimbolizalo + es - karakterek kozul, "
+				"majd inditsa ujra a programot!\nA fajl nem feldolgozhato.\n\n";
+			system("pause"); exit(EXIT_FAILURE);
+		}
 	}
 	be.clear();		// kitöröljük az eof flaget
 	be.seekg(0);	// visszaugrunk a fájl elejére, hogy beolvashassuk az értékeket
+
+	if (sorok_szama == 0) {
+		cerr << "Ures fajl! Nem feldolgozhato." << "\n\n";
+		system("pause"); exit(EXIT_FAILURE);
+	}
 
 	be >> sor; // beolvassuk az elsõ sort, mely a versenyzõk számát jelöli
 	// ha az elsõ sor numerikus, elmentjük számként, ha nem, a program kilép
@@ -43,7 +54,7 @@ Loveszet::Loveszet(char *filenev) {
 		fejlec_letszam = stoi(sor); 
 	}
 	else {
-		cout << "Ervenytelen fajl!\nAfajl elso soraban szamnak (a versenyzok szamanak) kell szerepelnie.\n\n";
+		cerr << "Ervenytelen fajl!\nA fajl elso soraban szamnak (a versenyzok szamanak) kell szerepelnie.\n\n";
 		system("pause"); exit(EXIT_FAILURE);
 	}
 
@@ -52,14 +63,14 @@ Loveszet::Loveszet(char *filenev) {
 
 	// ha a fejlécben szereplõ szám nem egyezik a sorok számával, a fájl hibás
 	if (fejlec_letszam != v) {
-		cerr << "Hibas fajl!\nA fajl elso soraban levo letszam nem egyezik a fajlban tarolt adatok szamaval."
+		cerr << "Hibas fajl!\nA fajl elso soraban levo letszam nem egyezik a fajlban tarolt adatok szamaval. "
 			"A fajl nem feldolgozhato." << endl << endl;
 		system("pause"); exit(EXIT_FAILURE);
 	}
 
 	// ha a versenyzõk száma nem 2 és 100 közötti, a program kilép
 	if (v < 2 || v > 100) {
-		cerr << "Legalabb 2 es legfeljebb 100 versenyzo lehet a fajlban.\nA fajl nem feldolgozhato" << endl << endl;
+		cerr << "Legalabb 2 es legfeljebb 100 versenyzo lehet a fajlban.\nA fajl nem feldolgozhato." << endl << endl;
 		system("pause"); exit(EXIT_FAILURE);
 	}
 
@@ -70,9 +81,18 @@ Loveszet::Loveszet(char *filenev) {
 
 	// beolvasunk minden nem üres sort, és megnézzük, hogy csak érvényes karakterek szerepelnek-e benne
 	// ha érvényes a sor, egy struktúra tömbben elmentõdnek az adatok
-	while (!be.eof() && i < v && be >> tmb[i].clovesek) {
-		tmb[i].slovesek = tmb[i].clovesek;
+	while (!be.eof() && i < v && be >> tmb[i].slovesek) {
+		if (tmb[i].slovesek.length() > 40) {
+			tmb[i].slovesek = tmb[i].slovesek.substr(0, 40);
+		}
+		if (tmb[i].slovesek.length() < 4) {
+			tmb[i].slovesek.replace(0,tmb[i].slovesek.length(),tmb[i].slovesek.length(),'-');
+		}
 		tmb[i].l = tmb[i].slovesek.length();
+		for (int j = 0; j < tmb[i].l; j++) {
+			tmb[i].clovesek[j] = tmb[i].slovesek[j];
+		}
+		
 		tmb[i].rajtszam = i + 1;
 		if (!Loveszet::ervenyes_szoveg(tmb[i].clovesek,tmb[i].l)) {
 			// a felhasználót az összes érvénytelen sorról értesítjük
@@ -227,7 +247,7 @@ int Loveszet::legtobb_loves() {
 			if (tmb[i].l > tmb[maxlovo].l) maxlovo = i;
 		}
 	}
-	return maxlovo;
+	return maxlovo + 1;
 }
 
 int Loveszet::loertek(char *sor, int hossz) {
@@ -254,7 +274,7 @@ int Loveszet::loertek(char *sor, int hossz) {
 
 int Loveszet::ossztalalt(int rajtszam) {
 	/*
-	Összegzés tételének módszerével a függvény kiszámolja, össz. hány találat ("+") volt
+	Megszámlálás tételének módszerével a függvény kiszámolja, össz. hány találat ("+") volt
 
 	int rajtszam: a rendezetlen tömb indexe, ami a rajtszám
 	
