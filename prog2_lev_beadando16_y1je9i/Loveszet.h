@@ -2,7 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <string>S
+#include <string>
 #include <ctime>
 using namespace std;
 
