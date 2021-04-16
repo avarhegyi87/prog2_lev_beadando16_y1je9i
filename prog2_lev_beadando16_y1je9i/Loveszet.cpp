@@ -104,7 +104,7 @@ Loveszet::Loveszet(char *filenev) {
 	}
 	// ha volt érvénytelen karaktert tartalmazó sor, a program már kigyûjtötte õket, itt kilép
 	if (nemerv_index) {
-		cerr << endl << nemerv_index << " ervenytelen rekord a fajlban, a fajl nem feldolgozhato!\n"
+		cerr << endl << nemerv_index << " db ervenytelen rekord a fajlban, a fajl nem feldolgozhato!\n"
 			"A rekordok csak '+' es '-' karaktereket tartalmazhatnak.\n\n";
 		system("pause"); exit(EXIT_FAILURE);
 	}
